@@ -1,4 +1,5 @@
 algorithms
 ==========
 
-Code training for algorithms and data structures
+This is the code training repository for algorithms and data structures
+
