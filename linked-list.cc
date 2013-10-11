@@ -94,7 +94,6 @@ struct Node<T>* LinkedList<T>::Insert (T &data)
     }
   else
     {
-      // insert new node in the end of linked list
 
       // new a node and set its next the head
       struct Node<T> *node = new struct Node<T>;
@@ -213,15 +212,13 @@ void LinkedList<T>::Print ()
     return;
 
   struct Node<T> *node = m_head;
-  while (node->next != 0)
+  while (node != 0)
   {
     std::cout << node->data << " ";
     node = node->next;
   }
 
-  // print the last item
-  std::cout << node->data << std::endl;
-
+  cout << endl;
 }
 
 int main (int argc, char *argv[])
