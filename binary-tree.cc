@@ -1,9 +1,8 @@
 /*Name: Binary tree
  *Operations: pre-order traversal, in-order traversal, post-order traversal, print level order(BFS + watcher)
  *Skills: queue, map class in C++
- *TBD: print level order (BFS + counter)
- *     pre/in/post order recur
- *     pre/in/post order un-recur
+ *TBD:  pre/in/post order un-recur
+ *      maximum heigth/depth
  */
 
 #include <iostream>
@@ -36,9 +35,6 @@ public:
     }
 
   /*APIs*/
-  //void PreorderTraversal ();
-  //void InorderTraversal ();
-  //void PostorderTraversal ();
 
   // init a fixed binary tree       
   //         1
@@ -47,8 +43,16 @@ public:
   //     2     8
   struct Node<T>* Init ();
 
-  // print level order: BFS, one queue, watcher pointer
-  void Print ();
+
+  // Tree traversal:
+  //   depth first search: end condition + sequence of (Xorder of root, Xorder of left and Xorder of right)
+  void PreorderTraversal (struct Node<T> *node);
+  void InorderTraversal (struct Node<T> *node);
+  void PostorderTraversal (struct Node<T> *node);
+
+
+  //   breadth first search (print by level): single queue +  watcher pointer/count numbers
+  void PrintBFS ();
 
 private:
   bool IsEmpty ();
@@ -112,11 +116,11 @@ struct Node<T>* Tree<T>::Init ()
 
   m_root = node1;
 
-  //cout << "root " << m_root->key << " left " << m_root->left->key << " right " << m_root->right->key << endl;
+  return m_root;
 }
 
 template<typename T>
-void Tree<T>::Print ()
+void Tree<T>::PrintBFS ()
 {
   if (IsEmpty () == true)
     {
@@ -124,15 +128,18 @@ void Tree<T>::Print ()
       return;
     }
 
+  bool usingPointer = false; // watch pointer
+  bool usingCounter = true;  // counter
+
   queue<struct Node<T>* > queueNodes; 
-  //int nextLevelNodesNum = 0;  // another way to do level by level
-  //int curLevelNodesNum = 0;
+  int nextLevelNodesNum = 0;  // another way to do level by level
+  int curLevelNodesNum = 0;
 
   struct Node<T>* cur = m_root;
   cout << cur->key << endl; // visit cur
   cur->visit = true;
   queueNodes.push (cur);
-  nextLevelNodesNum++;
+  curLevelNodesNum++;
 
   // set a watcher to always keep the last node in a level
   struct Node<T>* watcher = 0;
@@ -147,11 +154,11 @@ void Tree<T>::Print ()
    {
      cur = queueNodes.front ();
 
-     if (cur == watcher)
+     if (cur == watcher && usingPointer)
        cout << endl;
 
      queueNodes.pop ();
-     nextLevelNodesNum--;
+     curLevelNodesNum--;
 
      if (cur->left != 0)
        {
@@ -161,7 +168,9 @@ void Tree<T>::Print ()
              cur->visit = true;
              queueNodes.push (cur->left);
 
-             if (cur->left == watcher)
+             nextLevelNodesNum++;
+
+             if (cur->left == watcher && usingPointer)
              {
                cout << endl;              
               
@@ -174,6 +183,7 @@ void Tree<T>::Print ()
              }
            }
        }
+
      if (cur->right != 0)
        {
          if (cur->right->visit == false)
@@ -182,7 +192,9 @@ void Tree<T>::Print ()
              cur->visit = true;
              queueNodes.push (cur->right);
 
-             if (cur->right == watcher)
+             nextLevelNodesNum++;
+
+             if (cur->right == watcher && usingPointer)
              {
                cout << endl;              
               
@@ -196,11 +208,66 @@ void Tree<T>::Print ()
 
            }
        }
- 
 
-   }
+     if (curLevelNodesNum == 0 && usingCounter)
+       {
+         // this is the end of level
+         cout << endl;
+         
+         // update current level to the next level
+         curLevelNodesNum = nextLevelNodesNum;
+         // reset the next level node number to zero
+         nextLevelNodesNum = 0;
+       }
+ 
+   }// while ()
 
 }
+
+template<typename T>
+void Tree<T>::PreorderTraversal (struct Node<T> *node)
+{
+  if (node == 0)
+      return;
+ 
+  // visit node
+  cout << node->key << " ";
+  node->visit = true;
+
+  PreorderTraversal(node->left);
+  PreorderTraversal(node->right);
+}
+
+template<typename T>
+void Tree<T>::InorderTraversal (struct Node<T> *node)
+{
+  if (node == 0)
+      return;
+ 
+  InorderTraversal(node->left);
+
+  // visit node
+  cout << node->key << " "; 
+  node->visit = true;
+
+  InorderTraversal(node->right);
+}
+
+template<typename T>
+void Tree<T>::PostorderTraversal (struct Node<T> *node)
+{
+  if (node == 0)
+      return;
+ 
+  PostorderTraversal(node->left);
+  PostorderTraversal(node->right);
+
+  // visit node
+  cout << node->key << " "; 
+  node->visit = true;
+}
+
+
 
 int main (int argc, char *argv[])
 {
@@ -211,7 +278,21 @@ int main (int argc, char *argv[])
 
   root = tree.Init ();
 
-  tree.Print ();
+  cout << "BFS: " << endl;
+  tree.PrintBFS ();
+   
+  cout << "pre-order: " << endl;
+  //tree.PreorderTraversal (root);
+
+  cout << endl;
+  cout << "in-order: " << endl;
+  //tree.InorderTraversal (root);
+
+  cout << endl;
+  cout << "post-order: " << endl;
+  //tree.PostorderTraversal (root);
+
+  cout << endl;
 
   return 0;
 }
