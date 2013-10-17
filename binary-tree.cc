@@ -1,14 +1,14 @@
 /*Name: Binary tree
  *Operations: pre-order traversal, in-order traversal, post-order traversal, print level order(BFS + watcher)
+ *            in both cursive and non-cursive version
  *Skills: queue, map class in C++
- *TBD:  pre/in/post order un-recur
- *      maximum heigth/depth
  */
 
 #include <iostream>
 #include <string>
 #include <queue>
 #include <map>
+#include <stack>
 
 using namespace std;
 
@@ -44,15 +44,22 @@ public:
   struct Node<T>* Init ();
 
 
-  // Tree traversal:
-  //   depth first search: end condition + sequence of (Xorder of root, Xorder of left and Xorder of right)
+  // Tree traversal: all operations have the O(N) time complexity
+
+  //   depth first search (recur): end condition + recursive sequence of (Xorder of left and Xorder of right)
   void PreorderTraversal (struct Node<T> *node);
   void InorderTraversal (struct Node<T> *node);
   void PostorderTraversal (struct Node<T> *node);
 
+  //   depth first search (non recur): single stack
+  void NonrecurPreorderTraversal (struct Node<T> *node); // + anti recursive sequence of (Xorder of left and Xorder of right)
+  void NonrecurInorderTraversal (struct Node<T> *node); // + continue to traversal left until it faces the leaf node, then visit, pop and go to right
+  void NonrecurPostorderTraversal (struct Node<T> *node);
+  //  http://crackprogramming.blogspot.ca/2012/11/non-recursive-binary-tree-traversal.html
 
   //   breadth first search (print by level): single queue +  watcher pointer/count numbers
-  void PrintBFS ();
+  void PrintBFS ();  // NOTE: this can also be used to find the heigth and depth of a tree
+
 
 private:
   bool IsEmpty ();
@@ -128,88 +135,40 @@ void Tree<T>::PrintBFS ()
       return;
     }
 
-  bool usingPointer = false; // watch pointer
-  bool usingCounter = true;  // counter
-
   queue<struct Node<T>* > queueNodes; 
   int nextLevelNodesNum = 0;  // another way to do level by level
   int curLevelNodesNum = 0;
 
   struct Node<T>* cur = m_root;
   cout << cur->key << endl; // visit cur
-  cur->visit = true;
+
   queueNodes.push (cur);
   curLevelNodesNum++;
 
-  // set a watcher to always keep the last node in a level
-  struct Node<T>* watcher = 0;
-  if (cur->right != 0)
-     watcher = cur->right;
-  else if (cur->left != 0)
-     watcher = cur->left;
-  else
-     return;
- 
   while (!queueNodes.empty ())
    {
      cur = queueNodes.front ();
-
-     if (cur == watcher && usingPointer)
-       cout << endl;
 
      queueNodes.pop ();
      curLevelNodesNum--;
 
      if (cur->left != 0)
        {
-         if (cur->left->visit == false)
-           {
-             cout << cur->left->key << " ";
-             cur->visit = true;
-             queueNodes.push (cur->left);
+         cout << cur->left->key << " ";
+         queueNodes.push (cur->left);
 
-             nextLevelNodesNum++;
-
-             if (cur->left == watcher && usingPointer)
-             {
-               cout << endl;              
-              
-               // update watcher
-               struct Node<T>* node = cur->left;
-               if (node->right != 0)
-                 watcher = node->right;
-               else if (node->left != 0)
-                 watcher = node->left;
-             }
-           }
+         nextLevelNodesNum++;
        }
 
      if (cur->right != 0)
        {
-         if (cur->right->visit == false)
-           {
-             cout << cur->right->key << " ";
-             cur->visit = true;
-             queueNodes.push (cur->right);
+         cout << cur->right->key << " ";
+         queueNodes.push (cur->right);
 
-             nextLevelNodesNum++;
-
-             if (cur->right == watcher && usingPointer)
-             {
-               cout << endl;              
-              
-               // update watcher
-               struct Node<T>* node = cur->right;
-               if (node->right != 0)
-                 watcher = node->right;
-               else if (node->left != 0)
-                 watcher = node->left;
-             }
-
-           }
+         nextLevelNodesNum++;
        }
 
-     if (curLevelNodesNum == 0 && usingCounter)
+     if (curLevelNodesNum == 0)
        {
          // this is the end of level
          cout << endl;
@@ -267,7 +226,208 @@ void Tree<T>::PostorderTraversal (struct Node<T> *node)
   node->visit = true;
 }
 
+template<typename T>
+void Tree<T>::NonrecurPreorderTraversal (struct Node<T> *node)
+{
+  if (node == 0)
+    return;
 
+  stack<struct Node<T>* > stackNodes; 
+
+  // push root into stack
+  stackNodes.push (node);
+
+  while (!stackNodes.empty ()) // stackNodes.size != 0
+    {
+      struct Node<T>* top = stackNodes.top ();
+      // visit node
+      cout << top->key << " ";
+
+      stackNodes.pop ();
+
+      if ( top->right != 0 )
+        stackNodes.push (top->right);
+      if ( top->left !=0 )
+        stackNodes.push (top->left);
+    }
+
+}
+
+template<typename T>
+void Tree<T>::NonrecurInorderTraversal (struct Node<T> *node)
+{
+  if (node == 0)
+    return;
+
+  stack<struct Node<T>* > stackNodes; 
+  struct Node<T>* cur = node;
+
+  while ( !stackNodes.empty () || cur ) // stackNodes.size != 0
+    {      
+ 
+      // If this is a empty node, it means that we face the left empty child of leaf node;
+      // Operations: visit node, pop top node and then go to its right
+      if ( cur == 0 )
+        {
+          struct Node<T>* top = stackNodes.top ();
+          cout << top->key << " ";
+          stackNodes.pop ();
+          cur = top-> right;
+        }
+      else
+        { // if this is not an empty node, we just keep traversal the left node until we face the leaf node
+          stackNodes.push (cur);
+          cur = cur->left;
+        }
+    } // while
+}
+
+template<typename T>
+void Tree<T>::NonrecurPostorderTraversal (struct Node<T> *node)
+{
+  if (node == 0)
+    return;
+
+  stack<struct Node<T>* > stackNodes;
+  struct Node<T>* cur = node;
+  struct Node<T>* pre = 0; // always equal to the previous visited node
+  
+  stackNodes.push (cur);
+
+  // once the node is visited, pop it
+  while (!stackNodes.empty ())
+    {
+      cur = stackNodes.top ();
+
+      // in following cases: visit node when cur is the leaf node
+      //       (1)        (2)     (3)
+      //   pre ->  0
+      //   cur -> root     pre    pre
+      //                   /       \
+      //                 cur       cur
+      //  (1): this case happens in the beginning 
+      //  (2): this case happens when the cur goes down along the left path
+      //  (3): this case happens when left child is visited and the parent has the right child
+      if (!pre || pre->left == cur || pre->right == cur)
+        {
+          if (cur->left)
+            stackNodes.push (cur->left);
+          else if (cur->right)
+            stackNodes.push (cur->right);
+          else
+            {
+              cout << cur->key << " ";
+              stackNodes.pop ();
+            }
+        }
+      // in following cases: this case only happens after the left child (pre) being visited
+      //                     when cur does not have right child, visit node
+      //   cur
+      //   /
+      //  pre
+      //
+      else if ( cur->left == pre )
+        {
+          if (cur->right)
+            stackNodes.push (cur->right);  
+          else
+            {
+              cout << cur->key << " ";
+              stackNodes.pop ();
+            }
+        }
+       // in following cases: this case only happens after the right child (pre) being visited
+       //                     in this case,  both left and right childs are visited, then, the
+       //                     root node should be visited now
+       //   cur 
+       //    \
+       //    pre
+       //
+       else if ( cur->right == pre )
+        {
+          cout << cur->key << " ";
+          stackNodes.pop ();
+        }
+    
+      pre = cur;
+
+    } // while
+}
+
+/*  use wactch pointer
+template<typename T>
+void Tree<T>::PrintBFS ()
+{
+  if (IsEmpty () == true)
+    {
+      cout << "empty tree" << endl;
+      return;
+    }
+
+  queue<struct Node<T>* > queueNodes; 
+
+  struct Node<T>* cur = m_root;
+  cout << cur->key << endl; // visit cur
+
+  queueNodes.push (cur);
+
+  // set a watcher to always keep the last node in a level
+  struct Node<T>* watcher = 0;
+  if (cur->right != 0)
+     watcher = cur->right;
+  else if (cur->left != 0)
+     watcher = cur->left;
+  else
+     return;
+ 
+  while (!queueNodes.empty ())
+   {
+     cur = queueNodes.front ();
+
+     if (cur == watcher)
+       cout << endl;
+
+     queueNodes.pop ();
+
+     if (cur->left != 0)
+       {
+         cout << cur->left->key << " ";
+         queueNodes.push (cur->left);
+
+         if (cur->left == watcher)
+         {
+           cout << endl;              
+          
+           // update watcher
+           struct Node<T>* node = cur->left;
+           if (node->right != 0)
+             watcher = node->right;
+           else if (node->left != 0)
+             watcher = node->left;
+         }
+       }
+
+     if (cur->right != 0)
+       {
+         cout << cur->right->key << " ";
+         queueNodes.push (cur->right);
+
+         if (cur->right == watcher)
+         {
+           cout << endl;              
+          
+           // update watcher
+           struct Node<T>* node = cur->right;
+           if (node->right != 0)
+             watcher = node->right;
+           else if (node->left != 0)
+             watcher = node->left;
+         }
+       }
+   }// while ()
+
+}
+*/
 
 int main (int argc, char *argv[])
 {
@@ -280,17 +440,29 @@ int main (int argc, char *argv[])
 
   cout << "BFS: " << endl;
   tree.PrintBFS ();
-   
+  cout << endl;
+  
   cout << "pre-order: " << endl;
-  //tree.PreorderTraversal (root);
+  tree.PreorderTraversal (root);
+  cout << endl;
+  cout << "pre-order (non-recur): " << endl;
+  tree.NonrecurPreorderTraversal (root);
+  cout << endl;
 
   cout << endl;
   cout << "in-order: " << endl;
-  //tree.InorderTraversal (root);
+  tree.InorderTraversal (root);
+  cout << endl;
+  cout << "in-order (non-recur): " << endl;
+  tree.NonrecurInorderTraversal (root);
+  cout << endl;
 
   cout << endl;
   cout << "post-order: " << endl;
-  //tree.PostorderTraversal (root);
+  tree.PostorderTraversal (root);
+  cout << endl;
+  cout << "post-order (non-recur): " << endl;
+  tree.NonrecurPostorderTraversal (root);
 
   cout << endl;
 
