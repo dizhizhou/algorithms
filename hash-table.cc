@@ -5,7 +5,7 @@
 
  *  version 1.0:
             hash table: array (vector)
-            hash function: division
+            hash function: division, multiplication, djb2, sdbm, lose base
             collision: chaining (list)
 
      performance: 
@@ -19,14 +19,10 @@
     version 2.0
             hash table: self-balance binary search tree
             hash function: division 
-            collision: chaining (list)
+            collision: self-balance binary search tree
 
      performance:
-
-
-    version 3.0: only practice differrent methods of hash function and collision
-            hash function: multiplication, djb2, sdbm, lose base
-            collision: open addressing
+           insert, delete and search: O(logN)
  */
 
 #include <iostream>
@@ -35,6 +31,7 @@
 #include <cstdint> // c++ 11 support:  g++ -std=c++11 -o hash-table hash-table.cc  // must update gcc/g++ to 4.8 version
 //#include <stdint.h>
 #include <string>
+#include <cmath>
 
 using namespace std;
 
@@ -79,8 +76,12 @@ public:
 
   void Print ();
 
-private:
-  uint32_t Hash (uint32_t key); // map Key to the index of vector
+  // hash function
+  uint32_t HashDivision (uint32_t key); // map Key to the index of vector
+  uint32_t HashMultiplication (uint32_t key);
+  uint64_t HashDjb2 (string &str);
+  uint64_t HashSdbm (string &str);
+  uint64_t HashLoselose (string &str);
 
 private:
   uint32_t m_size;           // the maximum length of hash table
@@ -88,9 +89,73 @@ private:
 }; 
 
 template<typename T>
-uint32_t HashTable<T>::Hash (uint32_t key)
+uint32_t HashTable<T>::HashDivision (uint32_t key)
 {
   return key % m_size;// division
+}
+
+template<typename T>
+uint32_t HashTable<T>::HashMultiplication (uint32_t key)
+{
+  uint32_t hash = 0;
+  uint32_t m= 8;
+  float a = 0.618;
+
+  hash = floor (m * (key*a - floor (key*a) ) );
+
+  return hash;
+}
+
+
+template<typename T>
+uint64_t HashTable<T>::HashDjb2 (string &str)
+{
+  uint64_t hash = 5381;
+  int c;
+  uint32_t i = 0;
+
+  while ( i < str.size ())
+    {
+      c = static_cast<int>(str.at (i));
+      hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+      i++;
+    }
+
+  return hash;
+}
+
+template<typename T>
+uint64_t HashTable<T>::HashSdbm (string &str)
+{
+  uint64_t hash = 0;
+  int c;
+  uint32_t i = 0;
+
+  while ( i < str.size ())
+    {
+      c = static_cast<int>(str.at (i));
+      hash = c + (hash << 6) + (hash << 16) - hash;
+      i++;
+    }
+
+  return hash;
+}
+
+template<typename T>
+uint64_t HashTable<T>::HashLoselose (string &str)
+{
+  uint64_t hash = 0;
+  int c;
+  uint32_t i = 0;
+
+  while ( i < str.size ())
+    {
+      c = static_cast<int>(str.at (i));
+      hash += c;
+      i++;
+    }
+
+  return hash;
 }
 
 template<typename T>
@@ -102,7 +167,7 @@ bool HashTable<T>::Insert (uint32_t key, T data)
   node.key = key;
   node.data = data;
 
-  uint32_t index = Hash (key);
+  uint32_t index = HashDivision (key);
 
   // find the index-th item in vector
   list<Node> ls = m_htable[index];
@@ -171,7 +236,7 @@ T HashTable<T>::Search (uint32_t key)
 {
   bool found = false;  
 
-  uint32_t index = Hash (key);
+  uint32_t index = HashDivision (key);
 
   // find the index-th item in vector
   list<Node> ls = m_htable[index];
@@ -204,7 +269,7 @@ T HashTable<T>::Search (uint32_t key)
 template<typename T>
 bool HashTable<T>::Delete (uint32_t key)
 {
-  uint32_t index = Hash (key);
+  uint32_t index = HashDivision (key);
 
   // find the index-th item in vector
   list<Node>& ls = m_htable[index]; // note: we must use &, otherwise, we cannot erase node in m_htable
@@ -262,6 +327,13 @@ int main (int argc, char *argv[])
   table.Print ();
   cout << " search: " << key << " ";
   cout << table.Search (key)  << endl;  
+
+  string str("two");
+  cout << " djb2 " << table.HashDjb2 (str) << endl;
+  cout << " sdbm " << table.HashSdbm (str) << endl;
+  cout << " lose " << table.HashLoselose (str) << endl;
+  for (uint32_t i = 0; i < 10; i++)
+    cout << " Multiplication " << " key " << i << " hash " << table.HashMultiplication (i) << endl;
 
   return 0;
 }
