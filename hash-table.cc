@@ -1,21 +1,30 @@
 /*Name: Hash table
- *  Skills: typename list<Node>::iterator it;  // because 'it' depends on the template parameter 'Node', 'it' is a dependent name which 
-                                                  cannot be looked-up immediately
- *  version 1.0: 
-            hash table: vector
-            hash function: division
-            collision: list
-    TBD:
-    version 1.0: 
-            Search (): fail case: create and item and return it
-            Delete (): remove node from list
-    version 2.0
-            hash table: vector
-            hash function: multiplication, djb2, sdbm, lose base
-            collision: list
+ *  Skills: 
+            typename list<Node>::iterator it;  // because 'it' depends on the template parameter 'Node', 'it' is a dependent name which cannot be looked-up immediately
+            In Delete, user list<Node>& ls = ... // use &
 
-    version 3.0
-            hash table: binary search tree
+ *  version 1.0:
+            hash table: array (vector)
+            hash function: division
+            collision: chaining (list)
+
+     performance: 
+       insert: worst case: O (N)   // all nodes has the same index so that 
+                                      you need to search all the N node in the list to insert          
+               best case: O (1) // empty index
+       delete: worst case: O (N), best case: O (1)
+       search: worst case: O (N), best case: O (1)
+
+
+    version 2.0
+            hash table: self-balance binary search tree
+            hash function: division 
+            collision: chaining (list)
+
+     performance:
+
+
+    version 3.0: only practice differrent methods of hash function and collision
             hash function: multiplication, djb2, sdbm, lose base
             collision: open addressing
  */
@@ -160,7 +169,7 @@ void HashTable<T>::Print ()
 template<typename T>
 T HashTable<T>::Search (uint32_t key)
 {
-  bool found = true;  
+  bool found = false;  
 
   uint32_t index = Hash (key);
 
@@ -186,8 +195,9 @@ T HashTable<T>::Search (uint32_t key)
 
   if (!found)
     {
-      return "none"; // not sure how to make a pure template system
-      //exit (0);
+      // Do not search, create an empty an return it;
+      Insert (key, "");
+      return Search (key);
     }
 }
 
@@ -197,7 +207,7 @@ bool HashTable<T>::Delete (uint32_t key)
   uint32_t index = Hash (key);
 
   // find the index-th item in vector
-  list<Node> ls = m_htable[index];
+  list<Node>& ls = m_htable[index]; // note: we must use &, otherwise, we cannot erase node in m_htable
 
   if (ls.size () == 0)
     {
@@ -208,13 +218,11 @@ bool HashTable<T>::Delete (uint32_t key)
   else
     {
       typename list<Node>::iterator it;
-      uint32_t pos = 0;
-      for (it = ls.begin (); it != ls.end (); it++, pos++)
+      for (it = ls.begin (); it != ls.end (); it++)
         {
           if (it->key == key)
             {
-              cout << " remove the key number " << it->key << endl;
-              //ls.erase(pos,pos);
+              ls.erase(it);
               return true;
             }
         }
@@ -247,10 +255,13 @@ int main (int argc, char *argv[])
   uint32_t key = 5;
   cout << " search: " << key << " ";
   cout << table.Search (key)  << endl;  
-  cout << " search: " << key + 2 << " ";
-  cout << table.Search (key + 2)  << endl;  
+  cout << " search: " << key + 8 << " ";
+  cout << table.Search (key + 8)  << endl;  
 
-  table.Delete (5);
+  table.Delete (key);
+  table.Print ();
+  cout << " search: " << key << " ";
+  cout << table.Search (key)  << endl;  
 
   return 0;
 }
