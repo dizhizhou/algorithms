@@ -18,7 +18,6 @@ struct Node
   T key;
   struct Node<T>* left;
   struct Node<T>* right;
-  bool visit;
 };
 
 template<typename T>
@@ -85,7 +84,6 @@ struct Node<T>* Tree<T>::GetNode(T &key)
   node->key = key;
   node->left = 0;
   node->right = 0;
-  node->visit = false; 
 
   return node;
 }
@@ -191,7 +189,6 @@ void Tree<T>::PreorderTraversal (struct Node<T> *node)
  
   // visit node
   cout << node->key << " ";
-  node->visit = true;
 
   PreorderTraversal(node->left);
   PreorderTraversal(node->right);
@@ -207,7 +204,6 @@ void Tree<T>::InorderTraversal (struct Node<T> *node)
 
   // visit node
   cout << node->key << " "; 
-  node->visit = true;
 
   InorderTraversal(node->right);
 }
@@ -223,7 +219,6 @@ void Tree<T>::PostorderTraversal (struct Node<T> *node)
 
   // visit node
   cout << node->key << " "; 
-  node->visit = true;
 }
 
 template<typename T>
