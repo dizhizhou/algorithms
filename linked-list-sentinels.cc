@@ -1,6 +1,5 @@
 /*Name: Linked list + sentinels + runner*
   Skills: 
-        constructor in struct
         referernce return type: cannot return the ref of local var  (NOTE 1)
         use: pass by reference like this " const Type &data"  // data cannot be modified
         always use struct pointer to create a new node (NOTE 2)
