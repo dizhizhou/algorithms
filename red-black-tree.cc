@@ -58,7 +58,8 @@ public:
  // bool Delete ();
   void Print ();   
 
-  void LeftRotate (T &x);
+  void LeftRotate (struct Node<T> &node); // check right child == m_nil?
+  void RightRotate (struct Node<T> &node); // check left child == m_nil?
 
 private:
   struct Node<T>* m_nil; // sentinel node
@@ -140,17 +141,30 @@ void RedBlackTree<T>::Print ()
 }
 
 template<typename T>
-void RedBlackTree<T>::LeftRotate (T &node)
+void RedBlackTree<T>::LeftRotate (struct Node<T> &node)
 {
+  /*
+        y          x
+       / \   <-   / \
+      x  yr      xl  y
+     / \            / \
+    xl yl          yl yr
+  */
+
   // in this version, left rotate to the root node by default
   struct Node<T> *x = m_root;
   struct Node<T> *y = m_root->right;
 
+  // do not do left rotate if the right child is leaf
+  if ( y == m_nil)
+    return;
+
+  // move yl from y to x
   x->right = y->left;
   y->left->p = x;
 
+  // move x->p from x to y
   y->p = x->p;
-
   if ( x->p == m_nil)
     m_root = y;
   else if ( x == x->left)
@@ -158,9 +172,47 @@ void RedBlackTree<T>::LeftRotate (T &node)
   else
     x->p->right = y;
 
+  // switch x and y
   y->left = x;
   x->p = y;
 
+}
+
+template<typename T>
+void RedBlackTree<T>::RightRotate (struct Node<T> &node)
+{
+  /*
+        y          x
+       / \   ->   / \
+      x  yr      xl  y
+     / \            / \
+    xl xr          xr yr
+  */
+
+  // in this version, left rotate to the root node by default
+  struct Node<T> *y = m_root;
+  struct Node<T> *x = m_root->left;
+
+  // do not do right rotate if the right child is leaf
+  if ( x == m_nil)
+    return;
+
+  // move xr from x to y
+  y->left = x->right;
+  x->right->p = y;
+
+  // move y->p from y to x
+  x->p = y->p;
+  if ( y == m_root)
+    m_root = x;
+  else if ( y == y->p->left)
+    y->p->left = x;
+  else
+    y->p->right = x;
+
+  // switch x and y
+  x->right = y;
+  y->p = x;
 }
 
 int main (int argc, char *argv[])
@@ -194,9 +246,14 @@ int main (int argc, char *argv[])
   rb.Print ();
 
   cout << "left rotate" << endl;
-  i = 5;
-  rb.LeftRotate (i);
+  struct Node<type> node;
+  rb.LeftRotate (node);
   cout << "Print: " << endl; 
   rb.Print ();
+  cout << "right rotate" << endl;
+  rb.RightRotate (node);
+  cout << "Print: " << endl; 
+  rb.Print ();
+
  return 0;
 }
