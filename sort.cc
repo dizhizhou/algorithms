@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define MAX 10
+#define MAX 10000
 
 class Sort
 {
@@ -23,7 +23,8 @@ public:
     {
     }
 
-  void MergeSort ();
+  virtual void MergeSort ();
+  virtual void QuickSort ();
 
   void Print ();
 
@@ -32,6 +33,9 @@ private:
 
   void DoMergeSort (uint32_t p, uint32_t r);
   void Merge (uint32_t p, uint32_t q, uint32_t r);
+
+  void DoQuickSort (int p, int r); // NOTE: must be int, because there may be negative value, e.g., in worst case: 5,4,3,2,1
+  int Partition (int p, int r);
 
 private:
   vector<int> m_seq;
@@ -143,13 +147,66 @@ if (0)
   //Print ();
 }
 
+void
+Sort::QuickSort ()
+{
+  DoQuickSort (0, m_seq.size ()-1);
+}
+
+void
+Sort::DoQuickSort (int p, int r)
+{
+  if (p < r)
+    {
+      uint32_t q = Partition (p,r);
+      //cout << p << " " << q << " " << r << endl;
+      DoQuickSort (p, q-1);
+      DoQuickSort (q+1, r);
+    }
+}
+
+int
+Sort::Partition (int p, int r)
+{
+  int i = p - 1;
+  int j = p;
+
+  // put all elements < m_seq.at (r) to the left of m_seq.at (r)
+
+  for (;j < r;j++)
+    {
+      if ( m_seq.at (j) <= m_seq.at (r))
+        {
+          i++;
+        
+          // exchange i and j
+          int tmp = m_seq.at (j);
+          m_seq.at (j) = m_seq.at (i);
+          m_seq.at (i) = tmp;         
+        }
+    }
+  
+  // exchange i + 1 and r
+  int tmp = m_seq.at (i+1);
+  m_seq.at (i+1) = m_seq.at (r);
+  m_seq.at (r) = tmp;          
+
+  //Print ();
+  return i+1;
+
+}
+
 int main (int argv, char *argc[])
 {
   Sort sort;
   
+  //sort.Print ();
+  //cout << "MergeSort: ";
+  //sort.MergeSort ();
+  //sort.Print ();
+  //cout << "QuickSort: ";
+  sort.QuickSort ();
   sort.Print ();
-  cout << "MergeSort: ";
-  sort.MergeSort ();
-  sort.Print ();
+
   return 0;
 }
