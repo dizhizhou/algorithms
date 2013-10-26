@@ -8,8 +8,10 @@ using namespace std;
 uint8_t SwapOddEvenBits (const uint8_t &x)
 {
   // generate mask
-  uint8_t mask_odd = pow (2,7) + pow (2,5) + pow (2,3) + pow (2,1);   // 1010 1010
-  uint8_t mask_even = pow (2,6) + pow (2,4) + pow (2,2) + pow (2,0);  // 0101 0101
+  //uint8_t mask_odd = pow (2,7) + pow (2,5) + pow (2,3) + pow (2,1);   // 1010 1010
+  //uint8_t mask_even = pow (2,6) + pow (2,4) + pow (2,2) + pow (2,0);  // 0101 0101
+  uint8_t mask_odd = 0xaa; // uint16_t, 0xaaaa; uint32_t, oxaaaaaaaa;  10101 1010 
+  uint8_t mask_even = 0x55; // 0101 0101
 
   // retreive odd and even bit sequences
   uint8_t odd_seq = x & mask_odd;
@@ -21,8 +23,7 @@ uint8_t SwapOddEvenBits (const uint8_t &x)
   even_seq = even_seq << 1;
 
   // combine
-  uint8_t result = 0 | odd_seq;
-  result = result | even_seq;
+  uint8_t result = even_seq | odd_seq;
  
   return result;
 }

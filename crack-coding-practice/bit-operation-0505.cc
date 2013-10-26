@@ -19,8 +19,12 @@ uint32_t GetConvertBitNum (const int &i, const int &j)
       }
 
     t = t >> 1;
-
   } while (t);
+
+  // another more quick method to count the number of 1 in t
+  uint32_t count = 0;
+  for (int x = i ^ j; x != 0; x = x & (x-1))
+    count++;
 
   return num;
 }
