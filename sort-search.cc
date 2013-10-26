@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define MAX 10000
+#define MAX 10
 
 class Sort
 {
@@ -25,6 +25,8 @@ public:
 
   virtual void MergeSort ();
   virtual void QuickSort ();
+
+  uint32_t BinarySearch (const uint32_t &val);
 
   void Print ();
 
@@ -196,6 +198,32 @@ Sort::Partition (int p, int r)
 
 }
 
+uint32_t
+Sort::BinarySearch (const uint32_t &val)
+{
+  uint32_t low = 0;
+  uint32_t high = m_seq.size () - 1;
+  uint32_t mid = (low + high)/2;
+
+  while ( low < high )
+    {
+      if ( m_seq.at(mid) < val )
+        {
+          low = mid + 1;
+        }
+      else if ( m_seq.at (mid) > val)
+        {
+          high = mid - 1;
+        }   
+      else
+        return mid;
+
+      mid = (low + high)/2;
+    }
+
+  return 1000;
+}
+
 int main (int argv, char *argc[])
 {
   Sort sort;
@@ -207,6 +235,9 @@ int main (int argv, char *argc[])
   //cout << "QuickSort: ";
   sort.QuickSort ();
   sort.Print ();
+  
+  uint32_t s = 9;
+  cout << " search for " << s << " result position = " << sort.BinarySearch (s) << endl;
 
   return 0;
 }
