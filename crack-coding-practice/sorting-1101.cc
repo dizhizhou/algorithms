@@ -100,6 +100,42 @@ void Merge (int a[], int size_a, int b[], int size_b)
    
 }
 
+int RMerge (int a[], int size_a, int b[], int size_b)
+{
+  int last = size_a + size_b - 1;
+
+  if ( last < (size_a -1) )
+    return -1;
+
+  // merge b[] to a[] from right to left
+  int i = size_a - 1;
+  int j = size_b - 1;
+  while ( i >= 0 && j >=0 )
+    {
+      if (a[i] > b[j])
+        {
+          a[last] = a[i];
+          last--;
+          i--;
+        }
+      else if (a[i] <= b[j])
+        {
+          a[last] = b[j];
+          last--;
+          j--;
+        }
+    }
+
+  while (j>=0)
+    {
+      a[last] = b[j];
+      j--;
+      last--;
+    }
+
+  return 1;
+
+}
 
 int main (int argc, char *argv[])
 {
@@ -111,14 +147,14 @@ int main (int argc, char *argv[])
   for (int i = 0; i < 10; i++)
     cout << a[i] << " ";
   cout << endl;
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 5; i++)
     cout << b[i] << " ";
   cout << endl;
 
   // merge from the left
-  Merge(a, sizeof(a)/sizeof(int), b, sizeof(b)/sizeof(int));
+  //Merge(a, sizeof(a)/sizeof(int), b, sizeof(b)/sizeof(int));
   // merge from the right (optimal)
-  //RMerge(a, sizeof(a)/sizeof(int), b, sizeof(b)/sizeof(int));
+  RMerge(a, 4, b, 5); // the second and the third parameters are the real size of a[] and b[]
  
   for (int i = 0; i < 10; i++)
     cout << a[i] << " ";
