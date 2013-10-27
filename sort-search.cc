@@ -205,7 +205,7 @@ Sort::BinarySearch (const uint32_t &val)
   uint32_t high = m_seq.size () - 1;
   uint32_t mid = (low + high)/2;
 
-  while ( low < high )
+  while ( low <= high )
     {
       if ( m_seq.at(mid) < val )
         {
