@@ -42,13 +42,14 @@ int main (int argc, char *argv[])
 
   Hanoi (n,s1,s3,s2);
 
-/*
+
   while (s3.size())
     {
       cout << s3.top() << " ";
       s3.pop ();
     }
-*/
+  cout << endl;
+
   cout << "total " << count << " steps" << endl;
   return 0;
 }
