@@ -24,6 +24,22 @@ void Print (slist *start)
 }
 
 
+/*
+  update:
+  void radiosort (int array[], int maxDigitalNumber)
+
+    build a map<int key, vector<int> >;
+    m = 1;
+
+    for each digital number j: [1,t]
+      for all array[i]
+        retreive j-th digital number:  static_cast<int>(array[i]/m)%10
+        map array[i] to (j-th digital number, values list) // all values with same j-th digital number
+        copy all values in map into array[];
+        m = m * 10; // retreive next digital number
+
+*/
+
 slist *radixsort(slist *L, int t) 
 {
     int i, j, d, m=1;
@@ -42,7 +58,7 @@ slist *radixsort(slist *L, int t)
         /*sort each digital numbers*/
  
         // Process the list L
-        //  e.g., head[d] --> node 1 --> node 2 <-- tail[d]
+        //  e.g., head[d] --> node 1 --> node 2 <-- tail[d], d is the m-th digital number
         while ( L != NULL ) 
         {
             // Get the decimal digit with place value m
@@ -56,6 +72,10 @@ slist *radixsort(slist *L, int t)
  
             // Disconnect the current list item, making it self-contained
             temp->next = NULL;
+ 
+            /*for all the numbers with same value on m-th digintal number, enque
+              e.g., head[6] --> 426 --> 146 --> tail[6]
+             */
  
             if (head[d]!= NULL)
             {   // The queue for digit d is not empty
@@ -73,7 +93,7 @@ slist *radixsort(slist *L, int t)
             }
         } // while
  
-        /* re-build the L by insert nodes from head[] one by one
+        /* put all the numbers in the queues into original array L
          * as such, the sequence of nodes in the same queue can be maintained
          */
 

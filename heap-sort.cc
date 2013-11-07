@@ -57,7 +57,7 @@ Heap::Right (int i)
 void
 Heap::BuildHeap ()
 {
-  // get the last non leaf node
+  // get the last non leaf node, the last leaf node's parant
   int start = floor(m_seq.at (0)/2);
 
   for (;start > 0;start--)
@@ -71,6 +71,7 @@ Heap::MaxHeapify (int i)
   int right = Right (i);
   int largest = i;
 
+  // find the largest value among i and its two child
 
   if ( left <= m_seq.at (0)  && (m_seq.at (i) < m_seq.at (left)) )
     largest = left;

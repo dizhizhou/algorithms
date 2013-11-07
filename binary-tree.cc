@@ -221,6 +221,13 @@ void Tree<T>::PostorderTraversal (struct Node<T> *node)
   cout << node->key << " "; 
 }
 
+
+/**
+ * 1 stack
+ * push right first and then left
+ * visit and pop left first
+   then go right
+ */
 template<typename T>
 void Tree<T>::NonrecurPreorderTraversal (struct Node<T> *node)
 {
@@ -248,6 +255,12 @@ void Tree<T>::NonrecurPreorderTraversal (struct Node<T> *node)
 
 }
 
+/**
+ * 1 stack
+ * track to the most left node and push the node on the track path into stack
+ * vsit and then pop the most left node
+   then go to its right, repeat previous steps
+ */
 template<typename T>
 void Tree<T>::NonrecurInorderTraversal (struct Node<T> *node)
 {
@@ -277,6 +290,14 @@ void Tree<T>::NonrecurInorderTraversal (struct Node<T> *node)
     } // while
 }
 
+/**
+ * 1 stack
+ * define a pre pointer, which always trake the previous node visited by cur pointer
+ *  go to the left most node, push all nodes on the track path 
+    visit and then pop
+    then two cases: cur is the left leaf, go right leaf if it has; 
+                    cur is the right leaf, visit and then pop
+ */
 template<typename T>
 void Tree<T>::NonrecurPostorderTraversal (struct Node<T> *node)
 {

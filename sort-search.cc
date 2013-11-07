@@ -170,10 +170,10 @@ Sort::DoQuickSort (int p, int r)
 int
 Sort::Partition (int p, int r)
 {
-  int i = p - 1;
+  int i = p - 1; // track the last element that smaller than m_seq.at (r)
   int j = p;
 
-  // put all elements < m_seq.at (r) to the left of m_seq.at (r)
+  // put all elements < m_seq.at (r) to the left of m_seq.at (r), from m_seq.at (0) to m_seq.at (i)
 
   for (;j < r;j++)
     {
@@ -188,12 +188,16 @@ Sort::Partition (int p, int r)
         }
     }
   
+
+  // result: m_seq[0],[1],...,[i],[i+1],[i+2],...,[j],[r]
+  //         m_seq[0],[1],...,[i],                           all < m_seq[r]
+  //                                    [i+2],...,[j]        all > m_seq[r]  
   // exchange i + 1 and r
   int tmp = m_seq.at (i+1);
   m_seq.at (i+1) = m_seq.at (r);
   m_seq.at (r) = tmp;          
 
-  //Print ();
+  Print ();
   return i+1;
 
 }
@@ -228,7 +232,7 @@ int main (int argv, char *argc[])
 {
   Sort sort;
   
-  //sort.Print ();
+  sort.Print ();
   //cout << "MergeSort: ";
   //sort.MergeSort ();
   //sort.Print ();
